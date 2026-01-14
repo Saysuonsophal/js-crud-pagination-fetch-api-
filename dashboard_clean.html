@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CRUD,Pargimation, Filter category & serach with Fetch API</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/flowbite@3.0.0/dist/flowbite.min.css"
+      rel="stylesheet"
+    />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+
+  <body>
+    <div lass="max-w-8xl mx-auto mt-6 p-2 rounded-lg">
+      <div class="relative overflow-x-auto shadow-md sm:rounded-lg p-6 m-4">
+        <h3 class="text-2xl font-semibold mb-4">Dashboard</h3>
+
+        <form onsubmit="saveProduct(event)">
+          <div class="grid gap-6 mb-6 md:grid-cols-3">
+            <div>
+              <label class="block mb-2.5 text-sm font-medium text-heading"
+                >Product Title</label
+              >
+              <input
+                type="text"
+                id="title"
+                class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs placeholder:text-body"
+                placeholder="Product title"
+                required
+              />
+            </div>
+
+            <div>
+              <label class="block mb-2.5 text-sm font-medium text-heading"
+                >Price</label
+              >
+              <input
+                type="number"
+                id="price"
+                class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs placeholder:text-body"
+                placeholder="Product Price"
+                required
+              />
+            </div>
+            <div>
+              <label class="block mb-2.5 text-sm font-medium text-heading"
+                >Category</label
+              >
+              <select
+                id="categoryId"
+                class="block w-full px-3 py-2.5 bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs placeholder:text-body"
+              >
+                <option selected>Select Category</option>
+              </select>
+            </div>
+            <div>
+              <label
+                for="website"
+                class="block mb-2.5 text-sm font-medium text-heading"
+                >Image URL</label
+              >
+              <input
+                type="url"
+                id="Image-url"
+                class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs placeholder:text-body"
+                placeholder="https://domain.com"
+                required
+              />
+            </div>
+            <div class="col-span-2">
+              <label class="block mb-2.5 text-sm font-medium text-heading"
+                >Description</label
+              >
+
+              <textarea
+                id="description"
+                rows="1"
+                class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full p-3.5 shadow-xs placeholder:text-body"
+                placeholder="Write your thoughts here..."
+              ></textarea>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          >
+            Save Data
+          </button>
+          <!-- <button
+            type="button"
+            
+            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            onclick="updateProuduct()"
+          >
+            Update Data
+          </button> -->
+        </form>
+
+        <div
+          class="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-5 md:space-y-0 pb-4 bg-white"
+        >
+          <div>
+            <button
+              id="dropdownActionButton"
+              data-dropdown-toggle="dropdownAction"
+              class="inline-flex items-center text-gray-600 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-1.5"
+              type="button"
+            >
+              Action
+              <svg
+                class="w-2.5 h-2.5 ms-2.5"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 10 6"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="m1 1 4 4 4-4"
+                />
+              </svg>
+            </button>
+            <!-- Dropdown menu -->
+            <div
+              id="dropdownAction"
+              class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44"
+            >
+              <ul class="py-1 text-sm text-gray-700">
+                <li>
+                  <a href="#" class="block px-4 py-2 hover:bg-gray-100"
+                    >Reward</a
+                  >
+                </li>
+                <li>
+                  <a href="#" class="block px-4 py-2 hover:bg-gray-100"
+                    >Promote</a
+                  >
+                </li>
+                <li>
+                  <a href="#" class="block px-4 py-2 hover:bg-gray-100"
+                    >Activate account</a
+                  >
+                </li>
+              </ul>
+              <div class="py-1">
+                <a
+                  href="#"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  Delete User
+                </a>
+              </div>
+            </div>
+
+            <!-- FILTER DROPDOWN -->
+            <select
+              id="selectedCategoryID"
+              class="px-4 py-1 ml-2 border divide-y rounded-lg shadow bg-white w-44"
+              onchange="filtercategorybyId()"
+            >
+              <option value="all">All Categories</option>
+            </select>
+          </div>
+          <label for="table-search" class="sr-only">Search</label>
+          <div class="relative flex items-center justify-center">
+            <div
+              class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none"
+            >
+              <svg
+                class="w-4 h-4 text-gray-500 dark:text-gray-400"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                />
+              </svg>
+            </div>
+            <input
+              id="userInput"
+              type="text"
+              class="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Search for users"
+            />
+            <button
+              class="text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 mx-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              onclick="heandlSearchbyName()"
+            >
+              Search
+            </button>
+          </div>
+        </div>
+
+        <table class="w-full text-sm text-left text-gray-500">
+          <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+            <tr>
+              <th class="px-6 py-3">ID</th>
+              <th class="px-6 py-3">Title</th>
+              <th class="px-6 py-3">Description</th>
+              <th class="px-6 py-3">Price</th>
+              <th class="px-6 py-3">Category</th>
+              <th class="px-6 py-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr>
+              <td colspan="6" class="text-center text-blue-600 py-3">
+                Loading....
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <nav
+          class="flex items-center justify-between p-4"
+          aria-label="Table navigation"
+        >
+          <span class="text-sm text-gray-500">
+            Showing <span class="font-semibold">1</span>–<span
+              class="font-semibold"
+              >12</span
+            >
+          </span>
+          <ul class="inline-flex items-center -space-x-px mx-2" id="pagination">
+            <!-- <li>
+              <button
+                id="prevButton"
+                class="px-3 py-2 ml-0 leading-tight border rounded-l-lg hover:bg-gray-100"
+              >
+                Previous
+              </button>
+            </li>
+            <li>
+              <button class="px-3 py-1.5 ml-0 border bg-blue-600 text-white">
+                1
+              </button>
+            </li>
+            <li>
+              <button class="px-3 py-1.5 border-y hover:bg-gray-100">2</button>
+            </li>
+            <li>
+              <button class="px-3 py-1.5 border hover:bg-gray-100">3</button>
+            </li>
+            <li>
+              <button class="px-3 py-1.5 border hover:bg-gray-100">4</button>
+            </li>
+            <li>
+              <button class="px-3 py-1.5 border hover:bg-gray-100">5</button>
+            </li>
+            <li>
+              <button
+                id="nextButton"
+                class="px-3 py-2 leading-tight border rounded-r-lg hover:bg-gray-100"
+              >
+                Next
+              </button>
+            </li> -->
+          </ul>
+        </nav>
+      </div>
+    </div>
+    <script>
+      const API_URL = "https://api.escuelajs.co/api/v1";
+
+      let title = document.getElementById("title");
+      let price = document.getElementById("price");
+      let categoryId = document.getElementById("categoryId");
+      let Image_url = document.getElementById("Image-url");
+      let description = document.getElementById("description");
+      let selectedCategoryID = document.getElementById("selectedCategoryID");
+
+      let isEditProduct = null; //Global Variable of ProductId(using form Read and update data)
+      // let selectedCategoryID = "all"; // global variable of filter category
+
+      let currentPage;
+      let totalPages;
+      let limit = 12;
+
+      //Function to fetch product data from API
+      async function getProducts(page = 1) {
+        const offset = (page - 1) * limit;
+        try {
+          const respon = await fetch(
+            `${API_URL}/products?offset=${offset}&limit=${limit}`
+          );
+          const products = await respon.json();
+
+          if (!respon.ok) {
+            throw new Error("Error to fetch API required GET all products ");
+          }
+
+          //console.log("Product", JSON.stringify(products, null, 2));
+          console.log("All Product:", products);
+          console.log("Total Products:", products.length);
+          console.log("Offset number:", offset);
+
+          //console.log("Product length", products.length); //result: 9 items
+          renderProducts(products);
+          renderPagination(page); //Active currentPage pargination
+        } catch (error) {
+          console.log("GET Request API ERROR", error);
+        }
+      }
+      //fetch API
+      const getTotalProducts = async () => {
+        try {
+          const res = await fetch(`${API_URL}/products`);
+          const products = await res.json();
+          return products.length;
+        } catch (error) {
+          console.error("Error fetching total products:", error);
+          return 0;
+        }
+      };
+
+      //
+      async function numberPagination() {
+        let totalItems = await getTotalProducts();
+
+        totalPages = Math.ceil(totalItems / limit); // result = 1 page
+
+        renderPagination(totalPages);
+      }
+      numberPagination();
+
+      //Reander Pagination UI
+      function renderPagination(page) {
+        const pagination = document.getElementById("pagination");
+        pagination.innerHTML = "";
+        pagination.innerHTML += `<li>
+              <button
+                onclick="changePage(${page - 1})"
+                class="px-3 py-2 ml-0 leading-tight border rounded-l-lg hover:bg-gray-100"
+              >
+                Previous
+              </button>
+            </li>`;
+
+        for (let i = 1; i <= totalPages; i++) {
+          pagination.innerHTML += `<li>
+              <button onclick="changePage(${i})" class="px-3 py-1.5 ml-0 border text-back ${
+            i === page ? "bg-blue-600 text-white " : ""
+          }" >
+                ${i}
+              </button>
+            </li>`;
+        }
+        pagination.innerHTML += `<li>
+              <li>
+              <button
+                onclick="changePage(${page + 1})"
+                class="px-3 py-2 leading-tight border rounded-r-lg hover:bg-gray-100"
+              >
+                Next
+              </button>`;
+      }
+
+      //Pagination with Fetch API
+
+      function changePage(page) {
+        if (page < 1 || page > totalPages) return;
+        currentPage = page;
+        getProducts(currentPage);
+      }
+
+      //Search filter
+      async function heandlSearchbyName() {
+        const userInput = document.getElementById("userInput");
+        try {
+          const respon = await fetch(
+            `${API_URL}/products/?title=${userInput.value}`
+          );
+          if (!respon.ok) {
+            throw new Error("Failed to fetch products paginations");
+          }
+          const products = await respon.json();
+          // console.log("pagination product", products.length);
+          renderProducts(products);
+        } catch (error) {
+          console.error("Error API pagination product", error);
+        }
+      }
+      //Filter by Category
+      async function filtercategorybyId() {
+        try {
+          //console.log("Query API category ID to filter", data);
+          if (selectedCategoryID.value === "all") {
+            console.log("All products");
+            getProducts();
+          } else if (selectedCategoryID.value !== "all") {
+            console.log("A category name of products");
+
+            const respon = await fetch(
+              `${API_URL}/products/?categoryId=${selectedCategoryID.value}`
+            );
+            const selectfiltered = await respon.json();
+            console.log(selectfiltered);
+            renderProducts(selectfiltered);
+          }
+        } catch (error) {
+          console.log("Error API category request:", error);
+        }
+      }
+
+      // Category Rendering
+      async function getAllCetegory() {
+        try {
+          const respon = await fetch(`${API_URL}/categories`);
+          const categories = await respon.json();
+
+          console.log("All Category:", categories);
+
+          //query category in form
+          categories.forEach((category) => {
+            categoryId.innerHTML += `<option value="${category.id}">${category.name}</option>`;
+          });
+
+          // query category for filter
+          categories.forEach((category) => {
+            const option = document.createElement("option");
+            option.value = category.id; // category id is name of API
+            option.innerHTML = `<option value="${category.id}">${category.name}</option>`;
+            selectedCategoryID.append(option);
+          });
+        } catch (error) {
+          console.log("Error API category request:", error);
+        }
+      }
+
+      //Render Product function (Product table listing)
+      function renderProducts(products) {
+        const tableBody = document.getElementById("tableBody");
+        tableBody.innerHTML = ""; // this is working in processing DELETE method
+
+        products.forEach((product) => {
+          tableBody.innerHTML += `
+          <tr class="bg-white border-b hover:bg-gray-50">
+          <td class="px-6 py-4">${product.id}</td>
+          <td class="px-6 py-4 font-medium text-gray-900">${product.title}</td>
+          <td class="px-6 py-4 truncate max-w-xs">${product.description}</td>
+          <td class="px-6 py-4 truncate max-w-xs">$${product.price}</td>
+          <td><span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm">${product.category.name}</span></td>
+          <td class="px-6 py-4 flex gap-2">
+            <button class="text-blue-600 hover:underline" onclick="getProductsById(${product.id})">Edit</button>
+            <button class="text-red-600 hover:underline" onclick="deleteProduct(${product.id})">Delete</button>
+          </td>
+          </tr>
+        `;
+        });
+      }
+
+      //  HTTP METHOD = POST
+      async function createProduct(event) {
+        event.preventDefault();
+        // Use asyn/await with fetch API to make the POST request (Create new data)
+        // asyn/await mean waits until the API responds
+        try {
+          //preparing body same Post of API (calling request or payload)
+          const payload = {
+            title: title.value,
+            price: price.value,
+            categoryId: categoryId.value,
+            images: [Image_url.value],
+            description: description.value,
+          };
+          console.log("Payload", payload);
+
+          //Send data to API
+          const respon = await fetch(`${API_URL}/products`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload), // Convert the JavaScript object to a JSON string
+          });
+
+          //receives the response from the API
+          const data = await respon.json();
+          console.log("Respone POST request", data);
+
+          // Reset the form fields element only using the reset() method on the target element
+          event.target.reset();
+
+          getProducts(); // calling UI rendering New data of UI
+          alert("Product Create successfully");
+        } catch (error) {
+          console.log("Error POST request API:", error);
+        }
+      }
+
+      //This is condition between POST and PUT in One button
+      async function saveProduct(event) {
+        if (isEditProduct) {
+          //Update Product
+          updateProuduct(event);
+        } else {
+          //Create Product
+          createProduct(event);
+        }
+      }
+
+      // HTTP METHOD = PUT
+      // (one Create & one update button)function work with update data button
+      // (a Button for Creat&Update) function add parameter(event), event.preventDefault(), and event.target.reset()
+      async function updateProuduct(event) {
+        event.preventDefault();
+        try {
+          const Update_payload = {
+            title: title.value,
+            price: price.value,
+            categoryId: categoryId.value,
+            images: [Image_url.value],
+            description: description.value,
+          };
+          console.log("Product updated payload", Update_payload);
+
+          const respon = await fetch(`${API_URL}/products/${isEditProduct}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(Update_payload),
+          });
+
+          const data_update = await respon.json();
+          console.log("Product updated successfully:", data_update);
+
+          event.target.reset();
+          getProducts();
+          alert("Product updated successfully");
+        } catch (error) {
+          console.log("Error PUT request API:", error);
+        }
+      }
+
+      //  HTTP METHOD = GET (reading data API by ID for PUST)
+      //parament productId is catching ID of product That User click edit
+      async function getProductsById(productId) {
+        try {
+          const respon = await fetch(`${API_URL}/products/${productId}`);
+          const productEdit = await respon.json();
+
+          title.value = productEdit.title;
+          price.value = productEdit.price;
+          categoryId.value = productEdit.category.id;
+          Image_url.value = productEdit.images;
+          description.value = productEdit.description;
+
+          isEditProduct = productId;
+          console.log("Product ID list: ", isEditProduct);
+        } catch (error) {
+          console.log("API ERROR", error);
+        }
+      }
+
+      //  HTTP METHOD = PATCH
+      //  HTTP METHOD = DELETE
+      const deleteProduct = async (productId) => {
+        try {
+          const res = await fetch(`${API_URL}/products/${productId}`, {
+            method: "DELETE", //By default if we're not defined it, this function (fetch API) will using method: 'GET'
+          });
+          const data = await res.json();
+          console.log("Delete product data", data);
+
+          // this is render UI again, but can't calling renderProduct functions because not have parameter assign. So you're request to server again for getting data
+          getProducts();
+        } catch (error) {
+          console.log("API ERROR", error);
+        }
+      };
+
+      getProducts();
+      getAllCetegory();
+      renderPagination();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.0.0/dist/flowbite.min.js"></script>
+  </body>
+</html>
